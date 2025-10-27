@@ -10,6 +10,7 @@ public:
 
     AVLNode(int val) : key(val), left(nullptr), right(nullptr), height(1) {}
 };
+
 class AVLTree {
 private:
     AVLNode* root;
@@ -81,6 +82,73 @@ private:
 
         return node;
     }
+
+    AVLNode* minValueNode(AVLNode* node) {
+        AVLNode* current = node;
+        while (current->left)
+            current = current->left;
+        return current;
+    }
+
+    AVLNode* deleteNode(AVLNode* node, int key) {
+        if (!node)
+            return node;
+
+        // Step 1: Perform standard BST deletion
+        if (key < node->key)
+            node->left = deleteNode(node->left, key);
+        else if (key > node->key)
+            node->right = deleteNode(node->right, key);
+        else {
+            // Node with only one child or no child
+            if (!node->left) {
+                AVLNode* temp = node->right;
+                delete node;
+                return temp;
+            } else if (!node->right) {
+                AVLNode* temp = node->left;
+                delete node;
+                return temp;
+            }
+
+            // Node with two children: get the inorder successor
+            AVLNode* temp = minValueNode(node->right);
+            node->key = temp->key;
+            node->right = deleteNode(node->right, temp->key);
+        }
+
+        if (!node)
+            return node;
+
+        // Step 2: Update height of current node
+        node->height = 1 + std::max(height(node->left), height(node->right));
+
+        // Step 3: Get balance factor and rebalance if needed
+        int balance = getBalance(node);
+
+        // Left Left Case
+        if (balance > 1 && getBalance(node->left) >= 0)
+            return rightRotate(node);
+
+        // Left Right Case
+        if (balance > 1 && getBalance(node->left) < 0) {
+            node->left = leftRotate(node->left);
+            return rightRotate(node);
+        }
+
+        // Right Right Case
+        if (balance < -1 && getBalance(node->right) <= 0)
+            return leftRotate(node);
+
+        // Right Left Case
+        if (balance < -1 && getBalance(node->right) > 0) {
+            node->right = rightRotate(node->right);
+            return leftRotate(node);
+        }
+
+        return node;
+    }
+
     void preOrder(AVLNode* node) {
         if (node) {
             std::cout << node->key << " ";
@@ -112,6 +180,10 @@ public:
 
     void insert(int key) {
         root = insert(root, key);
+    }
+
+    void deleteNode(int key) {
+        root = deleteNode(root, key);
     }
 
     void preOrder() {
@@ -159,10 +231,11 @@ int main() {
     while (true) {
         std::cout << "\n=== Menu ===\n";
         std::cout << "1. Insert value\n";
-        std::cout << "2. Show tree structure\n";
-        std::cout << "3. Show preorder traversal\n";
-        std::cout << "4. Show inorder traversal\n";
-        std::cout << "5. Exit\n";
+        std::cout << "2. Delete value\n";
+        std::cout << "3. Show tree structure\n";
+        std::cout << "4. Show preorder traversal\n";
+        std::cout << "5. Show inorder traversal\n";
+        std::cout << "6. Exit\n";
         std::cout << "Enter choice: ";
         std::cin >> choice;
 
@@ -174,19 +247,25 @@ int main() {
                 std::cout << "Inserted " << value << "\n";
                 break;
             case 2:
-                tree.printTree();
+                std::cout << "Enter value to delete: ";
+                std::cin >> value;
+                tree.deleteNode(value);
+                std::cout << "Deleted " << value << "\n";
                 break;
             case 3:
+                tree.printTree();
+                break;
+            case 4:
                 std::cout << "Preorder: ";
                 tree.preOrder();
                 std::cout << "\n";
                 break;
-            case 4:
+            case 5:
                 std::cout << "Inorder: ";
                 tree.inOrder();
                 std::cout << "\n";
                 break;
-            case 5:
+            case 6:
                 std::cout << "Exiting...\n";
                 return 0;
             default:
