@@ -1,0 +1,7 @@
+# Compiled binaries
+process_manager
+*.o
+*.exe
+
+# Build directories
+build/
