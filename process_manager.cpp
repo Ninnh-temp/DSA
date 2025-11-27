@@ -107,6 +107,7 @@
 #include <iostream>
 #include <string>
 #include <algorithm>
+#include <iomanip>
 
 // ============================================================================
 // DATA STRUCTURES
@@ -132,8 +133,8 @@ std::string statusToString(ProcessStatus status) {
         case ProcessStatus::RUNNING:    return "RUNNING";
         case ProcessStatus::WAITING:    return "WAITING";
         case ProcessStatus::TERMINATED: return "TERMINATED";
-        default:                        return "UNKNOWN";
     }
+    return "UNKNOWN"; // Should never reach here with valid enum
 }
 
 /**
@@ -226,8 +227,7 @@ private:
 
 public:
     ProcessList(size_t initialCapacity = DEFAULT_CAPACITY) 
-        : capacity(initialCapacity == 0 ? DEFAULT_CAPACITY : initialCapacity),
-          start(0), end(0) {
+        : capacity(initialCapacity == 0 ? DEFAULT_CAPACITY : initialCapacity) {
         array = new Process[capacity];
         // Initialize start and end to the middle - KEY TO MIDDLE-PACKING
         start = capacity / 2;
@@ -399,7 +399,7 @@ public:
         std::cout << "\nArray visualization:" << std::endl;
         std::cout << "┌";
         for (size_t i = 0; i < capacity; ++i) {
-            std::cout << "───";
+            std::cout << "────";
             if (i < capacity - 1) std::cout << "┬";
         }
         std::cout << "┐" << std::endl;
@@ -407,9 +407,9 @@ public:
         std::cout << "│";
         for (size_t i = 0; i < capacity; ++i) {
             if (i >= start && i < end) {
-                std::cout << "P" << array[i].pid << " ";
+                std::cout << std::setw(3) << ("P" + std::to_string(array[i].pid)) << " ";
             } else {
-                std::cout << " _ ";
+                std::cout << "  _ ";
             }
             std::cout << "│";
         }
@@ -417,25 +417,25 @@ public:
         
         std::cout << "└";
         for (size_t i = 0; i < capacity; ++i) {
-            std::cout << "───";
+            std::cout << "────";
             if (i < capacity - 1) std::cout << "┴";
         }
         std::cout << "┘" << std::endl;
         
-        // Print indices
+        // Print indices with fixed width
         std::cout << " ";
         for (size_t i = 0; i < capacity; ++i) {
-            std::cout << " " << i << "  ";
+            std::cout << std::setw(4) << i << " ";
         }
         std::cout << std::endl;
         
         // Show start/end markers
         std::cout << " ";
         for (size_t i = 0; i < capacity; ++i) {
-            if (i == start && i == end) std::cout << "S=E ";
-            else if (i == start) std::cout << " S  ";
-            else if (i == end) std::cout << " E  ";
-            else std::cout << "    ";
+            if (i == start && i == end) std::cout << " S=E ";
+            else if (i == start) std::cout << "  S  ";
+            else if (i == end) std::cout << "  E  ";
+            else std::cout << "     ";
         }
         std::cout << std::endl;
         
