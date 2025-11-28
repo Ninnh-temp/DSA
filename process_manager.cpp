@@ -106,8 +106,6 @@
 
 #include <iostream>
 #include <string>
-#include <algorithm>
-#include <iomanip>
 
 // ============================================================================
 // DATA STRUCTURES
@@ -167,6 +165,16 @@ private:
     size_t end;          // Index one past last element (exclusive)
 
     static const size_t DEFAULT_CAPACITY = 10;
+
+    /**
+     * Pad a string with spaces on the left to achieve specified width.
+     * If the string is already at or exceeds the width, it is returned unchanged.
+     * Used as a replacement for std::setw() without requiring <iomanip>.
+     */
+    static std::string padLeft(const std::string& str, size_t width) {
+        if (str.length() >= width) return str;
+        return std::string(width - str.length(), ' ') + str;
+    }
 
     /**
      * Rebalance elements to center them in the array
@@ -407,7 +415,7 @@ public:
         std::cout << "│";
         for (size_t i = 0; i < capacity; ++i) {
             if (i >= start && i < end) {
-                std::cout << std::setw(3) << ("P" + std::to_string(array[i].pid)) << " ";
+                std::cout << padLeft("P" + std::to_string(array[i].pid), 3) << " ";
             } else {
                 std::cout << "  _ ";
             }
@@ -425,7 +433,7 @@ public:
         // Print indices with fixed width
         std::cout << " ";
         for (size_t i = 0; i < capacity; ++i) {
-            std::cout << std::setw(4) << i << " ";
+            std::cout << padLeft(std::to_string(i), 4) << " ";
         }
         std::cout << std::endl;
         
