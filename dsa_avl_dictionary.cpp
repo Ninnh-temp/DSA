@@ -161,7 +161,7 @@ private:
         return node;
     }
 
-    DictNode<K, V>* search(DictNode<K, V>* node, K key) {
+    DictNode<K, V>* search(DictNode<K, V>* node, K key) const {
         if (!node || node->key == key)
             return node;
 
@@ -215,16 +215,18 @@ public:
         return search(root, key) != nullptr;
     }
 
-    V* get(K key) {
+    const V* get(K key) const {
         DictNode<K, V>* node = search(root, key);
         return node ? &(node->value) : nullptr;
     }
 
-    void update(K key, V value) {
+    bool update(K key, V value) {
         DictNode<K, V>* node = search(root, key);
         if (node) {
             node->value = value;
+            return true;
         }
+        return false;
     }
 
     void printAll() {
@@ -297,6 +299,10 @@ int main() {
             case 1: {
                 std::cout << "Enter key: ";
                 std::getline(std::cin, key);
+                if (key.empty()) {
+                    std::cout << "Error: Key cannot be empty.\n";
+                    break;
+                }
                 std::cout << "Enter value: ";
                 std::getline(std::cin, value);
                 dict.insert(key, value);
@@ -306,7 +312,11 @@ int main() {
             case 2: {
                 std::cout << "Enter key to search: ";
                 std::getline(std::cin, key);
-                std::string* found = dict.get(key);
+                if (key.empty()) {
+                    std::cout << "Error: Key cannot be empty.\n";
+                    break;
+                }
+                const std::string* found = dict.get(key);
                 if (found) {
                     std::cout << "Found: [" << key << ": " << *found << "]\n";
                 } else {
@@ -317,6 +327,10 @@ int main() {
             case 3: {
                 std::cout << "Enter key to delete: ";
                 std::getline(std::cin, key);
+                if (key.empty()) {
+                    std::cout << "Error: Key cannot be empty.\n";
+                    break;
+                }
                 if (dict.contains(key)) {
                     dict.remove(key);
                     std::cout << "Entry deleted successfully.\n";
