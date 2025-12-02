@@ -1,11 +1,6 @@
 #include <iostream>
 #include <string>
 
-template <typename T>
-T maxVal(T a, T b) {
-    return (a > b) ? a : b;
-}
-
 template <typename K, typename V>
 class DictNode {
 public:
@@ -23,6 +18,10 @@ class AVLDictionary {
 private:
     DictNode<K, V>* root;
     int nodeCount;
+
+    static int maxVal(int a, int b) {
+        return (a > b) ? a : b;
+    }
 
     int height(DictNode<K, V>* node) {
         return node ? node->height : 0;
