@@ -1,6 +1,10 @@
 #include <iostream>
-#include <algorithm>
 #include <string>
+
+template <typename T>
+T maxVal(T a, T b) {
+    return (a > b) ? a : b;
+}
 
 template <typename K, typename V>
 class DictNode {
@@ -35,8 +39,8 @@ private:
         x->right = y;
         y->left = T2;
 
-        y->height = std::max(height(y->left), height(y->right)) + 1;
-        x->height = std::max(height(x->left), height(x->right)) + 1;
+        y->height = maxVal(height(y->left), height(y->right)) + 1;
+        x->height = maxVal(height(x->left), height(x->right)) + 1;
 
         return x;
     }
@@ -48,8 +52,8 @@ private:
         y->left = x;
         x->right = T2;
 
-        x->height = std::max(height(x->left), height(x->right)) + 1;
-        y->height = std::max(height(y->left), height(y->right)) + 1;
+        x->height = maxVal(height(x->left), height(x->right)) + 1;
+        y->height = maxVal(height(y->left), height(y->right)) + 1;
 
         return y;
     }
@@ -70,7 +74,7 @@ private:
             return node;
         }
 
-        node->height = 1 + std::max(height(node->left), height(node->right));
+        node->height = 1 + maxVal(height(node->left), height(node->right));
 
         int balance = getBalance(node);
 
@@ -134,7 +138,7 @@ private:
         if (!node)
             return node;
 
-        node->height = 1 + std::max(height(node->left), height(node->right));
+        node->height = 1 + maxVal(height(node->left), height(node->right));
 
         int balance = getBalance(node);
 
@@ -269,11 +273,12 @@ int main() {
     std::cout << "Initializing with sample data...\n\n";
 
     // Insert sample data
-    dict.insert("apple", "A fruit that is red or green");
-    dict.insert("banana", "A yellow curved fruit");
-    dict.insert("cherry", "A small round red fruit");
-    dict.insert("date", "A sweet brown fruit");
-    dict.insert("elderberry", "A dark purple berry");
+    dict.insert("cat", "A small domesticated feline");
+    dict.insert("dog", "A loyal domesticated canine");
+    dict.insert("raccoon", "A nocturnal mammal with a masked face");
+    dict.insert("rat", "A small rodent with a long tail");
+    dict.insert("tiger", "A large striped wild cat");
+    dict.insert("zebra", "A striped African equine");
 
     std::cout << "Initial dictionary:\n";
     dict.printAll();
