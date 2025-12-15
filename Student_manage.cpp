@@ -285,6 +285,92 @@ private:
         return 1 + countNodes(node->left) + countNodes(node->right);
     }
 
+    // Helper function to display tree structure visually
+    void displayTreeStructure(AVLNode* node, const string& prefix, bool isLeft, bool isRoot) {
+        if (!node)
+            return;
+
+        cout << prefix;
+        
+        if (!isRoot) {
+            cout << (isLeft ? "├── " : "└── ");
+        }
+        
+        cout << node->student.getId() << " (" << node->student.getName() << ")\n";
+        
+        // Update prefix for children
+        string newPrefix = prefix;
+        if (!isRoot) {
+            newPrefix += (isLeft ? "│   " : "    ");
+        }
+        
+        // Check if there are any children to display
+        bool hasLeft = (node->left != nullptr);
+        bool hasRight = (node->right != nullptr);
+        
+        // Display left child first (appears at top in visualization)
+        if (hasLeft) {
+            displayTreeStructure(node->left, newPrefix, hasRight, false);
+        }
+        
+        // Display right child
+        if (hasRight) {
+            displayTreeStructure(node->right, newPrefix, false, false);
+        }
+    }
+
+    // In-order traversal with step-by-step visualization
+    void inOrderVisual(const AVLNode* node, int& step, string& path) {
+        if (node) {
+            inOrderVisual(node->left, step, path);
+            
+            cout << "Step " << step++ << ": Visiting node " 
+                 << node->student.getId() << " (" 
+                 << node->student.getName() << ")\n";
+            
+            if (!path.empty()) {
+                path += " → ";
+            }
+            path += to_string(node->student.getId());
+            
+            inOrderVisual(node->right, step, path);
+        }
+    }
+
+    // Pre-order traversal with step-by-step visualization
+    void preOrderVisual(const AVLNode* node, int& step, string& path) {
+        if (node) {
+            cout << "Step " << step++ << ": Visiting node " 
+                 << node->student.getId() << " (" 
+                 << node->student.getName() << ")\n";
+            
+            if (!path.empty()) {
+                path += " → ";
+            }
+            path += to_string(node->student.getId());
+            
+            preOrderVisual(node->left, step, path);
+            preOrderVisual(node->right, step, path);
+        }
+    }
+
+    // Post-order traversal with step-by-step visualization
+    void postOrderVisual(const AVLNode* node, int& step, string& path) {
+        if (node) {
+            postOrderVisual(node->left, step, path);
+            postOrderVisual(node->right, step, path);
+            
+            cout << "Step " << step++ << ": Visiting node " 
+                 << node->student.getId() << " (" 
+                 << node->student.getName() << ")\n";
+            
+            if (!path.empty()) {
+                path += " → ";
+            }
+            path += to_string(node->student.getId());
+        }
+    }
+
 public:
     // Constructor
     AVLTree() : root(nullptr) {}
@@ -347,6 +433,56 @@ public:
         }
         return false;
     }
+
+    // Display tree structure visually
+    void displayTreeStructure() {
+        if (!root) {
+            cout << "Tree is empty.\n";
+            return;
+        }
+        cout << "\n=== Tree Structure ===\n";
+        displayTreeStructure(root, "", false, true);
+        cout << "\n";
+    }
+
+    // In-order traversal visualization (Left → Root → Right)
+    void displayInOrderTraversal() {
+        if (!root) {
+            cout << "Tree is empty.\n";
+            return;
+        }
+        cout << "\n=== In-order Traversal (Left → Root → Right) ===\n";
+        int step = 1;
+        string path = "";
+        inOrderVisual(root, step, path);
+        cout << "\nTraversal Order: " << path << "\n\n";
+    }
+
+    // Pre-order traversal visualization (Root → Left → Right)
+    void displayPreOrderTraversal() {
+        if (!root) {
+            cout << "Tree is empty.\n";
+            return;
+        }
+        cout << "\n=== Pre-order Traversal (Root → Left → Right) ===\n";
+        int step = 1;
+        string path = "";
+        preOrderVisual(root, step, path);
+        cout << "\nTraversal Order: " << path << "\n\n";
+    }
+
+    // Post-order traversal visualization (Left → Right → Root)
+    void displayPostOrderTraversal() {
+        if (!root) {
+            cout << "Tree is empty.\n";
+            return;
+        }
+        cout << "\n=== Post-order Traversal (Left → Right → Root) ===\n";
+        int step = 1;
+        string path = "";
+        postOrderVisual(root, step, path);
+        cout << "\nTraversal Order: " << path << "\n\n";
+    }
 };
 
 // Function to clear input buffer
@@ -375,7 +511,9 @@ void displayMenu() {
     cout << "4. Display All Students\n";
     cout << "5. Update Student\n";
     cout << "6. Display Tree Info\n";
-    cout << "7. Exit\n";
+    cout << "7. Visualize Tree Structure\n";
+    cout << "8. Tree Traversal Visualization\n";
+    cout << "9. Exit\n";
     cout << "Enter choice: ";
 }
 
@@ -483,6 +621,45 @@ void displayTreeInfo(AVLTree& tree) {
     }
 }
 
+// Function to visualize tree structure
+void visualizeTreeStructure(AVLTree& tree) {
+    tree.displayTreeStructure();
+}
+
+// Function to display traversal menu and handle traversal visualization
+void traversalVisualizationMenu(AVLTree& tree) {
+    cout << "\n=== Traversal Visualization ===\n";
+    cout << "1. In-order Traversal (Left → Root → Right)\n";
+    cout << "2. Pre-order Traversal (Root → Left → Right)\n";
+    cout << "3. Post-order Traversal (Left → Right → Root)\n";
+    cout << "4. Show All Traversals\n";
+    cout << "5. Back to Main Menu\n";
+    cout << "Enter choice: ";
+    
+    int choice = getIntInput();
+    
+    switch (choice) {
+        case 1:
+            tree.displayInOrderTraversal();
+            break;
+        case 2:
+            tree.displayPreOrderTraversal();
+            break;
+        case 3:
+            tree.displayPostOrderTraversal();
+            break;
+        case 4:
+            tree.displayInOrderTraversal();
+            tree.displayPreOrderTraversal();
+            tree.displayPostOrderTraversal();
+            break;
+        case 5:
+            return;
+        default:
+            cout << "Invalid choice. Please enter a number between 1 and 5.\n";
+    }
+}
+
 // Function to load test data
 void loadTestData(AVLTree& tree) {
     cout << "\n=== Loading Test Data ===\n";
@@ -550,10 +727,16 @@ int main() {
                 displayTreeInfo(tree);
                 break;
             case 7:
+                visualizeTreeStructure(tree);
+                break;
+            case 8:
+                traversalVisualizationMenu(tree);
+                break;
+            case 9:
                 cout << "Thank you for using Student Management System. Goodbye!\n";
                 return 0;
             default:
-                cout << "Invalid choice. Please enter a number between 1 and 7.\n";
+                cout << "Invalid choice. Please enter a number between 1 and 9.\n";
         }
     }
 }
