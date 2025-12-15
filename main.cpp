@@ -168,6 +168,8 @@ private:
 
     // Find node with minimum value (leftmost node)
     AVLNode* minValueNode(AVLNode* node) {
+        if (!node)
+            return nullptr;
         AVLNode* current = node;
         while (current->left)
             current = current->left;
