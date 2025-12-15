@@ -9,3 +9,6 @@ build/
 
 # CodeQL artifacts
 _codeql_detected_source_root
+
+# Backup files
+*.backup
