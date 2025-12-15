@@ -19,12 +19,23 @@ A comprehensive Student Management System implemented using AVL Tree data struct
 ├── AVLTree.h         # AVL Tree class definition
 ├── AVLTree.cpp       # AVL Tree implementation with rotations
 ├── main.cpp          # Main program with menu interface
+├── Makefile          # Build configuration
 └── DSA_AVL_tree.cpp  # Original AVL tree implementation (demo)
 ```
 
 ## Compilation
 
-To compile the Student Management System:
+### Using Makefile (Recommended)
+
+```bash
+make              # Build the project
+make clean        # Clean build artifacts
+make run          # Build and run the program
+```
+
+### Manual Compilation
+
+To compile the Student Management System manually:
 
 ```bash
 g++ -o student_management main.cpp Student.cpp AVLTree.cpp -std=c++11
