@@ -483,12 +483,48 @@ void displayTreeInfo(AVLTree& tree) {
     }
 }
 
+// Function to load test data
+void loadTestData(AVLTree& tree) {
+    cout << "\n=== Loading Test Data ===\n";
+    
+    // Test data: 5 students
+    struct TestStudent {
+        string name;
+        int id;
+    };
+    
+    TestStudent testStudents[] = {
+        {"Lan", 24147},
+        {"Tú", 23984},
+        {"Nam", 23974},
+        {"Minh", 23222},
+        {"Bách", 22568}
+    };
+    
+    int count = 0;
+    for (const auto& ts : testStudents) {
+        Student student(ts.id, ts.name);
+        if (tree.insert(student)) {
+            cout << "  Added: " << ts.name << " (ID: " << ts.id << ")\n";
+            count++;
+        } else {
+            cout << "  Warning: Could not add " << ts.name << " (ID: " << ts.id << ") - duplicate ID\n";
+        }
+    }
+    
+    cout << "\nTotal students loaded: " << count << "\n";
+    cout << "=============================\n";
+}
+
 int main() {
     AVLTree tree;
     int choice;
 
     cout << "=== Student Management System ===\n";
     cout << "Using AVL Tree for efficient student record management\n";
+
+    // Load test data
+    loadTestData(tree);
 
     while (true) {
         displayMenu();
