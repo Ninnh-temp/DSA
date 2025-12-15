@@ -286,7 +286,7 @@ private:
     }
 
     // Helper function to display tree structure visually
-    void displayTreeStructure(AVLNode* node, string prefix, bool isLeft, bool isRoot) {
+    void displayTreeStructure(AVLNode* node, const string& prefix, bool isLeft, bool isRoot) {
         if (!node)
             return;
 
@@ -320,7 +320,7 @@ private:
     }
 
     // In-order traversal with step-by-step visualization
-    void inOrderVisual(AVLNode* node, int& step, string& path) {
+    void inOrderVisual(const AVLNode* node, int& step, string& path) {
         if (node) {
             inOrderVisual(node->left, step, path);
             
@@ -338,7 +338,7 @@ private:
     }
 
     // Pre-order traversal with step-by-step visualization
-    void preOrderVisual(AVLNode* node, int& step, string& path) {
+    void preOrderVisual(const AVLNode* node, int& step, string& path) {
         if (node) {
             cout << "Step " << step++ << ": Visiting node " 
                  << node->student.getId() << " (" 
@@ -355,7 +355,7 @@ private:
     }
 
     // Post-order traversal with step-by-step visualization
-    void postOrderVisual(AVLNode* node, int& step, string& path) {
+    void postOrderVisual(const AVLNode* node, int& step, string& path) {
         if (node) {
             postOrderVisual(node->left, step, path);
             postOrderVisual(node->right, step, path);
