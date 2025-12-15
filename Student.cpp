@@ -18,7 +18,9 @@ std::string Student::getName() const {
 
 // Setters
 void Student::setId(int id) {
-    this->id = id;
+    if (isValidId(id)) {
+        this->id = id;
+    }
 }
 
 void Student::setName(const std::string& name) {
