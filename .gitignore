@@ -1,6 +1,5 @@
 # Compiled binaries
 process_manager
-student_management
 *.o
 *.exe
 
