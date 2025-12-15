@@ -164,7 +164,8 @@ AVLNode* AVLTree::deleteNode(AVLNode* node, int id, bool& deleted) {
         node->student = temp->student;
         
         // Delete the inorder successor
-        node->right = deleteNode(node->right, temp->student.getId(), deleted);
+        bool tempDeleted = false;
+        node->right = deleteNode(node->right, temp->student.getId(), tempDeleted);
     }
 
     if (!node)
