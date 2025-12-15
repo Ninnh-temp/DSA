@@ -307,7 +307,7 @@ public:
     }
 
     // Search for a student by ID (returns nullptr if not found)
-    Student* search(int id) {
+    const Student* search(int id) {
         AVLNode* node = search(root, id);
         return node ? &(node->student) : nullptr;
     }
@@ -338,9 +338,9 @@ public:
 
     // Update student name
     bool updateStudent(int id, const string& newName) {
-        Student* student = search(id);
-        if (student) {
-            student->setName(newName);
+        AVLNode* node = search(root, id);
+        if (node) {
+            node->student.setName(newName);
             return true;
         }
         return false;
@@ -429,7 +429,7 @@ void searchStudent(AVLTree& tree) {
     cout << "Enter Student ID to search: ";
     id = getIntInput();
 
-    Student* student = tree.search(id);
+    const Student* student = tree.search(id);
     if (student) {
         cout << "Found: ";
         student->display();

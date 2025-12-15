@@ -10,18 +10,22 @@ A comprehensive Student Management System implemented using AVL Tree data struct
 - **Input Validation**: Ensures data integrity with proper validation
 - **Sorted Display**: Shows all students sorted by ID using in-order traversal
 - **Tree Information**: Display tree height and statistics
+- **Single-File Implementation**: All code contained in one main.cpp file
 
 ## File Structure
 
 ```
-├── Student.h          # Student class definition
-├── Student.cpp        # Student class implementation
-├── AVLTree.h         # AVL Tree class definition
-├── AVLTree.cpp       # AVL Tree implementation with rotations
-├── main.cpp          # Main program with menu interface
+├── main.cpp          # Complete Student Management System (single file)
 ├── Makefile          # Build configuration
-└── DSA_AVL_tree.cpp  # Original AVL tree implementation (demo)
+├── Student.h         # Legacy: Student class definition (not used)
+├── Student.cpp       # Legacy: Student class implementation (not used)
+├── AVLTree.h         # Legacy: AVL Tree class definition (not used)
+├── AVLTree.cpp       # Legacy: AVL Tree implementation (not used)
+├── DSA_AVL_tree.cpp  # Original AVL tree implementation (demo)
+└── process_manager.cpp  # Process manager demo
 ```
+
+**Note**: The current implementation uses a **single-file approach** where all code (Student class, AVLNode structure, AVLTree class, and main function) is contained in `main.cpp`. The separate header and source files are legacy files kept for reference.
 
 ## Compilation
 
@@ -35,10 +39,10 @@ make run          # Build and run the program
 
 ### Manual Compilation
 
-To compile the Student Management System manually:
+To compile the Student Management System manually (single file):
 
 ```bash
-g++ -o student_management main.cpp Student.cpp AVLTree.cpp -std=c++11
+g++ -o student_management main.cpp -std=c++11
 ```
 
 ## Usage
@@ -119,21 +123,23 @@ The implementation includes all necessary AVL tree operations:
 
 ## Implementation Details
 
-### Student Class
-- Encapsulates student data (ID and name)
-- Provides validation for 5-digit IDs
-- Implements getters and setters
+### Single-File Architecture
 
-### AVLNode Class
-- Contains student data
-- Maintains left and right child pointers
-- Tracks node height for balancing
+All code is contained in a single `main.cpp` file as per requirements:
+- **Student Class**: Encapsulates student data (ID and name) with validation for 5-digit IDs
+- **AVLNode Class**: Contains student data, left/right child pointers, and tracks node height for balancing
+- **AVLTree Class**: Implements self-balancing AVL tree with automatic rotations after insertions and deletions
+- **Main Function**: Provides menu-driven interface for user interaction
 
-### AVLTree Class
-- Implements self-balancing AVL tree
-- Performs automatic rotations after insertions and deletions
-- Maintains balance factor for each node
-- Provides efficient search, insert, update, and delete operations
+### AVL Tree Rotations
+
+The implementation includes all necessary AVL tree rotations:
+- **Left Rotation**: Balances right-heavy subtrees
+- **Right Rotation**: Balances left-heavy subtrees
+- **Left-Right Rotation**: Handles left-right case
+- **Right-Left Rotation**: Handles right-left case
+
+All rotations are performed automatically after insertions and deletions to maintain the AVL tree balance property.
 
 ## Testing
 
