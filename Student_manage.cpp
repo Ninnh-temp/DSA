@@ -677,6 +677,12 @@ void searchByGradeRange(AVLTree& tree) {
     }
     clearInputBuffer();
 
+    // Validate grade range
+    if (!Student::isValidGrade(minGrade) || !Student::isValidGrade(maxGrade)) {
+        cout << "Error: Grades must be between 0.0 and 100.0.\n";
+        return;
+    }
+
     if (minGrade > maxGrade) {
         cout << "Error: Minimum grade cannot be greater than maximum grade.\n";
         return;
