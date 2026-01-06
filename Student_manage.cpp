@@ -13,41 +13,47 @@ using namespace std;
 
 /**
  * Student class representing a student record
- * Contains a 5-digit ID (10000-99999) and a name
+ * Contains auto-assigned ID, name, and grade
  */
 class Student {
 private:
-    int id;           // 5-digit student ID (10000-99999)
+    int id;           // Auto-assigned student ID
     string name;      // Student name
+    double grade;     // Student grade (0.0 - 100.0)
 
 public:
     // Constructors
-    Student() : id(0), name("") {}
-    Student(int id, const string& name) : id(id), name(name) {}
+    Student() : id(0), name(""), grade(0.0) {}
+    Student(int id, const string& name, double grade) : id(id), name(name), grade(grade) {}
 
     // Getters
     int getId() const { return id; }
     string getName() const { return name; }
+    double getGrade() const { return grade; }
 
     // Setters
     void setId(int id) {
-        if (isValidId(id)) {
-            this->id = id;
-        }
+        this->id = id;
     }
     
     void setName(const string& name) {
         this->name = name;
     }
 
-    // Validate that ID is 5 digits (between 10000 and 99999)
-    static bool isValidId(int id) {
-        return id >= 10000 && id <= 99999;
+    void setGrade(double grade) {
+        if (grade >= 0.0 && grade <= 100.0) {
+            this->grade = grade;
+        }
+    }
+
+    // Validate that grade is valid (between 0.0 and 100.0)
+    static bool isValidGrade(double grade) {
+        return grade >= 0.0 && grade <= 100.0;
     }
 
     // Display student information
     void display() const {
-        cout << id << " - " << name;
+        cout << id << " - " << name << " (Grade: " << grade << ")";
     }
 };
 
@@ -67,11 +73,12 @@ public:
 
 /**
  * AVLTree class implementing a self-balancing AVL tree
- * Uses student ID as the key for balancing
+ * Uses student name as the key for balancing
  */
 class AVLTree {
 private:
     AVLNode* root;
+    int nextId;  // Auto-incrementing ID counter
 
     // Get height of a node
     int height(AVLNode* node) {
@@ -123,15 +130,15 @@ private:
             return new AVLNode(student);
         }
 
-        int studentId = student.getId();
-        int nodeId = node->student.getId();
+        string studentName = student.getName();
+        string nodeName = node->student.getName();
 
-        if (studentId < nodeId) {
+        if (studentName < nodeName) {
             node->left = insert(node->left, student, inserted);
-        } else if (studentId > nodeId) {
+        } else if (studentName > nodeName) {
             node->right = insert(node->right, student, inserted);
         } else {
-            // Duplicate ID - don't insert
+            // Duplicate name - don't insert
             inserted = false;
             return node;
         }
@@ -144,21 +151,21 @@ private:
 
         // 4. Balance the tree if needed
         // Left Left Case
-        if (balance > 1 && studentId < node->left->student.getId())
+        if (balance > 1 && studentName < node->left->student.getName())
             return rightRotate(node);
 
         // Right Right Case
-        if (balance < -1 && studentId > node->right->student.getId())
+        if (balance < -1 && studentName > node->right->student.getName())
             return leftRotate(node);
 
         // Left Right Case
-        if (balance > 1 && studentId > node->left->student.getId()) {
+        if (balance > 1 && studentName > node->left->student.getName()) {
             node->left = leftRotate(node->left);
             return rightRotate(node);
         }
 
         // Right Left Case
-        if (balance < -1 && studentId < node->right->student.getId()) {
+        if (balance < -1 && studentName < node->right->student.getName()) {
             node->right = rightRotate(node->right);
             return leftRotate(node);
         }
@@ -177,17 +184,17 @@ private:
     }
 
     // Delete a node from the tree
-    AVLNode* deleteNode(AVLNode* node, int id, bool& deleted) {
+    AVLNode* deleteNode(AVLNode* node, const string& name, bool& deleted) {
         if (!node) {
             deleted = false;
             return node;
         }
 
         // 1. Perform standard BST deletion
-        if (id < node->student.getId()) {
-            node->left = deleteNode(node->left, id, deleted);
-        } else if (id > node->student.getId()) {
-            node->right = deleteNode(node->right, id, deleted);
+        if (name < node->student.getName()) {
+            node->left = deleteNode(node->left, name, deleted);
+        } else if (name > node->student.getName()) {
+            node->right = deleteNode(node->right, name, deleted);
         } else {
             // Node found - delete it
             deleted = true;
@@ -211,7 +218,7 @@ private:
             
             // Delete the inorder successor
             bool tempDeleted = false;
-            node->right = deleteNode(node->right, temp->student.getId(), tempDeleted);
+            node->right = deleteNode(node->right, temp->student.getName(), tempDeleted);
         }
 
         if (!node)
@@ -247,18 +254,18 @@ private:
         return node;
     }
 
-    // Search for a student by ID
-    AVLNode* search(AVLNode* node, int id) {
-        if (!node || node->student.getId() == id)
+    // Search for a student by name
+    AVLNode* search(AVLNode* node, const string& name) {
+        if (!node || node->student.getName() == name)
             return node;
 
-        if (id < node->student.getId())
-            return search(node->left, id);
+        if (name < node->student.getName())
+            return search(node->left, name);
         else
-            return search(node->right, id);
+            return search(node->right, name);
     }
 
-    // In-order traversal (displays students in sorted order by ID)
+    // In-order traversal (displays students in sorted order by name)
     void inOrder(AVLNode* node) {
         if (node) {
             inOrder(node->left);
@@ -266,6 +273,23 @@ private:
             node->student.display();
             cout << "\n";
             inOrder(node->right);
+        }
+    }
+
+    // Search students by grade range
+    void searchByGradeRange(AVLNode* node, double minGrade, double maxGrade, bool& found) {
+        if (node) {
+            searchByGradeRange(node->left, minGrade, maxGrade, found);
+            
+            double grade = node->student.getGrade();
+            if (grade >= minGrade && grade <= maxGrade) {
+                cout << "  ";
+                node->student.display();
+                cout << "\n";
+                found = true;
+            }
+            
+            searchByGradeRange(node->right, minGrade, maxGrade, found);
         }
     }
 
@@ -296,7 +320,7 @@ private:
             cout << (isLeft ? "├── " : "└── ");
         }
         
-        cout << node->student.getId() << " (" << node->student.getName() << ")\n";
+        cout << node->student.getName() << " (ID: " << node->student.getId() << ", Grade: " << node->student.getGrade() << ")\n";
         
         // Update prefix for children
         string newPrefix = prefix;
@@ -325,13 +349,13 @@ private:
             inOrderVisual(node->left, step, path);
             
             cout << "Step " << step++ << ": Visiting node " 
-                 << node->student.getId() << " (" 
-                 << node->student.getName() << ")\n";
+                 << node->student.getName() << " (ID: " << node->student.getId() 
+                 << ", Grade: " << node->student.getGrade() << ")\n";
             
             if (!path.empty()) {
                 path += " → ";
             }
-            path += to_string(node->student.getId());
+            path += node->student.getName();
             
             inOrderVisual(node->right, step, path);
         }
@@ -341,13 +365,13 @@ private:
     void preOrderVisual(const AVLNode* node, int& step, string& path) {
         if (node) {
             cout << "Step " << step++ << ": Visiting node " 
-                 << node->student.getId() << " (" 
-                 << node->student.getName() << ")\n";
+                 << node->student.getName() << " (ID: " << node->student.getId() 
+                 << ", Grade: " << node->student.getGrade() << ")\n";
             
             if (!path.empty()) {
                 path += " → ";
             }
-            path += to_string(node->student.getId());
+            path += node->student.getName();
             
             preOrderVisual(node->left, step, path);
             preOrderVisual(node->right, step, path);
@@ -361,46 +385,51 @@ private:
             postOrderVisual(node->right, step, path);
             
             cout << "Step " << step++ << ": Visiting node " 
-                 << node->student.getId() << " (" 
-                 << node->student.getName() << ")\n";
+                 << node->student.getName() << " (ID: " << node->student.getId() 
+                 << ", Grade: " << node->student.getGrade() << ")\n";
             
             if (!path.empty()) {
                 path += " → ";
             }
-            path += to_string(node->student.getId());
+            path += node->student.getName();
         }
     }
 
 public:
     // Constructor
-    AVLTree() : root(nullptr) {}
+    AVLTree() : root(nullptr), nextId(10000) {}
 
     // Destructor
     ~AVLTree() {
         destroyTree(root);
     }
 
-    // Insert a student (returns false if duplicate ID)
+    // Insert a student (returns false if duplicate name)
     bool insert(const Student& student) {
         bool inserted = false;
-        root = insert(root, student, inserted);
+        // Create a new student with auto-assigned ID
+        Student newStudent(nextId, student.getName(), student.getGrade());
+        root = insert(root, newStudent, inserted);
+        if (inserted) {
+            nextId++;  // Increment ID for next student
+        }
         return inserted;
     }
 
-    // Delete a student by ID (returns false if not found)
-    bool deleteStudent(int id) {
+    // Delete a student by name (returns false if not found)
+    bool deleteStudent(const string& name) {
         bool deleted = false;
-        root = deleteNode(root, id, deleted);
+        root = deleteNode(root, name, deleted);
         return deleted;
     }
 
-    // Search for a student by ID (returns nullptr if not found)
-    const Student* search(int id) {
-        AVLNode* node = search(root, id);
+    // Search for a student by name (returns nullptr if not found)
+    const Student* search(const string& name) {
+        AVLNode* node = search(root, name);
         return node ? &(node->student) : nullptr;
     }
 
-    // Display all students in sorted order (by ID)
+    // Display all students in sorted order (by name)
     void displayAll() {
         if (!root) {
             cout << "No students in the system.\n";
@@ -424,14 +453,27 @@ public:
         return root == nullptr;
     }
 
-    // Update student name
-    bool updateStudent(int id, const string& newName) {
-        AVLNode* node = search(root, id);
+    // Update student grade
+    bool updateStudent(const string& name, double newGrade) {
+        AVLNode* node = search(root, name);
         if (node) {
-            node->student.setName(newName);
+            node->student.setGrade(newGrade);
             return true;
         }
         return false;
+    }
+
+    // Display students by grade range
+    void displayByGradeRange(double minGrade, double maxGrade) {
+        if (!root) {
+            cout << "No students in the system.\n";
+            return;
+        }
+        bool found = false;
+        searchByGradeRange(root, minGrade, maxGrade, found);
+        if (!found) {
+            cout << "No students found in the grade range [" << minGrade << ", " << maxGrade << "].\n";
+        }
     }
 
     // Display tree structure visually
@@ -509,27 +551,19 @@ void displayMenu() {
     cout << "2. Remove Student\n";
     cout << "3. Search Student\n";
     cout << "4. Display All Students\n";
-    cout << "5. Update Student\n";
+    cout << "5. Update Student Grade\n";
     cout << "6. Display Tree Info\n";
-    cout << "7. Visualize Tree Structure\n";
-    cout << "8. Tree Traversal Visualization\n";
-    cout << "9. Exit\n";
+    cout << "7. Search by Grade Range\n";
+    cout << "8. Visualize Tree Structure\n";
+    cout << "9. Tree Traversal Visualization\n";
+    cout << "10. Exit\n";
     cout << "Enter choice: ";
 }
 
 // Function to add a student
 void addStudent(AVLTree& tree) {
-    int id;
     string name;
-
-    cout << "Enter Student ID (5-digit number, 10000-99999): ";
-    id = getIntInput();
-
-    // Validate ID
-    if (!Student::isValidId(id)) {
-        cout << "Error: ID must be a 5-digit number between 10000 and 99999.\n";
-        return;
-    }
+    double grade;
 
     cout << "Enter Student Name: ";
     getline(cin, name);
@@ -540,72 +574,116 @@ void addStudent(AVLTree& tree) {
         return;
     }
 
-    Student student(id, name);
+    cout << "Enter Student Grade (0.0 - 100.0): ";
+    while (!(cin >> grade)) {
+        cout << "Invalid input. Please enter a valid grade (0.0 - 100.0): ";
+        clearInputBuffer();
+    }
+    clearInputBuffer();
+
+    // Validate grade
+    if (!Student::isValidGrade(grade)) {
+        cout << "Error: Grade must be between 0.0 and 100.0.\n";
+        return;
+    }
+
+    Student student(0, name, grade);  // ID will be auto-assigned
     if (tree.insert(student)) {
-        cout << "Successfully added student: ID=" << id << ", Name=\"" << name << "\"\n";
+        cout << "Successfully added student: Name=\"" << name << "\", Grade=" << grade << "\n";
     } else {
-        cout << "Error: A student with ID " << id << " already exists.\n";
+        cout << "Error: A student with name \"" << name << "\" already exists.\n";
     }
 }
 
 // Function to remove a student
 void removeStudent(AVLTree& tree) {
-    int id;
+    string name;
 
-    cout << "Enter Student ID to remove: ";
-    id = getIntInput();
+    cout << "Enter Student Name to remove: ";
+    getline(cin, name);
 
-    if (tree.deleteStudent(id)) {
-        cout << "Successfully removed student with ID " << id << ".\n";
+    if (tree.deleteStudent(name)) {
+        cout << "Successfully removed student \"" << name << "\".\n";
     } else {
-        cout << "Error: Student with ID " << id << " not found.\n";
+        cout << "Error: Student with name \"" << name << "\" not found.\n";
     }
 }
 
 // Function to search for a student
 void searchStudent(AVLTree& tree) {
-    int id;
+    string name;
 
-    cout << "Enter Student ID to search: ";
-    id = getIntInput();
+    cout << "Enter Student Name to search: ";
+    getline(cin, name);
 
-    const Student* student = tree.search(id);
+    const Student* student = tree.search(name);
     if (student) {
         cout << "Found: ";
         student->display();
         cout << "\n";
     } else {
-        cout << "Student with ID " << id << " not found.\n";
+        cout << "Student with name \"" << name << "\" not found.\n";
     }
 }
 
 // Function to display all students
 void displayAllStudents(AVLTree& tree) {
-    cout << "\n=== All Students (sorted by ID) ===\n";
+    cout << "\n=== All Students (sorted by name) ===\n";
     tree.displayAll();
 }
 
 // Function to update a student
 void updateStudent(AVLTree& tree) {
-    int id;
-    string newName;
+    string name;
+    double newGrade;
 
-    cout << "Enter Student ID to update: ";
-    id = getIntInput();
+    cout << "Enter Student Name to update: ";
+    getline(cin, name);
 
-    cout << "Enter new name: ";
-    getline(cin, newName);
+    cout << "Enter new grade (0.0 - 100.0): ";
+    while (!(cin >> newGrade)) {
+        cout << "Invalid input. Please enter a valid grade (0.0 - 100.0): ";
+        clearInputBuffer();
+    }
+    clearInputBuffer();
 
-    if (newName.empty()) {
-        cout << "Error: Name cannot be empty.\n";
+    if (!Student::isValidGrade(newGrade)) {
+        cout << "Error: Grade must be between 0.0 and 100.0.\n";
         return;
     }
 
-    if (tree.updateStudent(id, newName)) {
-        cout << "Successfully updated student with ID " << id << ".\n";
+    if (tree.updateStudent(name, newGrade)) {
+        cout << "Successfully updated grade for student \"" << name << "\".\n";
     } else {
-        cout << "Error: Student with ID " << id << " not found.\n";
+        cout << "Error: Student with name \"" << name << "\" not found.\n";
     }
+}
+
+// Function to search students by grade range
+void searchByGradeRange(AVLTree& tree) {
+    double minGrade, maxGrade;
+
+    cout << "Enter minimum grade: ";
+    while (!(cin >> minGrade)) {
+        cout << "Invalid input. Please enter a valid grade: ";
+        clearInputBuffer();
+    }
+    clearInputBuffer();
+
+    cout << "Enter maximum grade: ";
+    while (!(cin >> maxGrade)) {
+        cout << "Invalid input. Please enter a valid grade: ";
+        clearInputBuffer();
+    }
+    clearInputBuffer();
+
+    if (minGrade > maxGrade) {
+        cout << "Error: Minimum grade cannot be greater than maximum grade.\n";
+        return;
+    }
+
+    cout << "\n=== Students with grades between " << minGrade << " and " << maxGrade << " ===\n";
+    tree.displayByGradeRange(minGrade, maxGrade);
 }
 
 // Function to display tree information
@@ -664,28 +742,28 @@ void traversalVisualizationMenu(AVLTree& tree) {
 void loadTestData(AVLTree& tree) {
     cout << "\n=== Loading Test Data ===\n";
     
-    // Test data: 5 students
+    // Test data: 5 students with grades
     struct TestStudent {
         string name;
-        int id;
+        double grade;
     };
     
     TestStudent testStudents[] = {
-        {"Lan", 24147},
-        {"Tú", 23984},
-        {"Nam", 23974},
-        {"Minh", 23222},
-        {"Bách", 22568}
+        {"Lan", 85.5},
+        {"Tú", 92.0},
+        {"Nam", 78.5},
+        {"Minh", 88.0},
+        {"Bách", 95.5}
     };
     
     int count = 0;
     for (const auto& ts : testStudents) {
-        Student student(ts.id, ts.name);
+        Student student(0, ts.name, ts.grade);  // ID will be auto-assigned
         if (tree.insert(student)) {
-            cout << "  Added: " << ts.name << " (ID: " << ts.id << ")\n";
+            cout << "  Added: " << ts.name << " (Grade: " << ts.grade << ")\n";
             count++;
         } else {
-            cout << "  Warning: Could not add " << ts.name << " (ID: " << ts.id << ") - duplicate ID\n";
+            cout << "  Warning: Could not add " << ts.name << " - duplicate name\n";
         }
     }
     
@@ -699,6 +777,7 @@ int main() {
 
     cout << "=== Student Management System ===\n";
     cout << "Using AVL Tree for efficient student record management\n";
+    cout << "Tree is now balanced by student name\n";
 
     // Load test data
     loadTestData(tree);
@@ -727,16 +806,19 @@ int main() {
                 displayTreeInfo(tree);
                 break;
             case 7:
-                visualizeTreeStructure(tree);
+                searchByGradeRange(tree);
                 break;
             case 8:
-                traversalVisualizationMenu(tree);
+                visualizeTreeStructure(tree);
                 break;
             case 9:
+                traversalVisualizationMenu(tree);
+                break;
+            case 10:
                 cout << "Thank you for using Student Management System. Goodbye!\n";
                 return 0;
             default:
-                cout << "Invalid choice. Please enter a number between 1 and 9.\n";
+                cout << "Invalid choice. Please enter a number between 1 and 10.\n";
         }
     }
 }
